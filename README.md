@@ -20,7 +20,7 @@ Currently, three image formats are available:
 * picam.RGB
 * picam.Gray
 
-The time between frames measured on a Raspberry Pi Zero W is between `180ms` to
+The time between frames, measured on a Raspberry Pi Zero W, is between `180ms` to
 `210ms`.
 
 ## Why this library?
