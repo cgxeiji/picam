@@ -21,7 +21,17 @@ Currently, three image formats are available:
 * picam.Gray
 
 The time between frames, measured on a Raspberry Pi Zero W, is between `180ms` to
-`210ms`.
+`210ms` for a `640x480` pixels image.
+
+If you want to test the speed in your system, run:
+```
+$ cd $(go env GOPATH)/src/github.com/cgxeiji/picam
+$ go test -bench . -benchtime=10x
+```
+
+This will take 10 frames and output the average time between each frame. Change
+`-benchtime=10x` to `100x` or `Nx` to change the number of frames to test.
+
 
 ## Why this library?
 
