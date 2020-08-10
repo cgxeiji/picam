@@ -13,8 +13,10 @@ import (
 
 // Camera is a struct that stores camera information.
 type Camera struct {
-	width, height int
-	cmd           *exec.Cmd
+	cmd *exec.Cmd
+	// Width sets the width of the image
+	// Height sets the height of the image
+	Width, Height int
 	frame         <-chan []uint8
 	format        Format
 	done          chan struct{}
@@ -92,8 +94,8 @@ func New(width, height int, format Format) (*Camera, error) {
 	}()
 
 	return &Camera{
-		width:  width,
-		height: height,
+		Width:  width,
+		Height: height,
 		cmd:    cmd,
 		frame:  frame,
 		format: format,
@@ -121,11 +123,11 @@ func (c *Camera) Close() {
 //	picam.RGB  -> image.NRGBA
 //	picam.Gray -> image.Gray
 func (c *Camera) Read() (img image.Image) {
-	size := image.Rect(0, 0, c.width, c.height)
+	size := image.Rect(0, 0, c.Width, c.Height)
 	switch c.format {
 	case RGB:
 		rgba := image.NewNRGBA(size)
-		pixels := make([]uint8, c.width*c.height*4)
+		pixels := make([]uint8, c.Width*c.Height*4)
 		rgb := <-c.frame
 		for i, idx := 0, 0; i < len(rgb); i++ {
 			pixels[idx] = rgb[i]
@@ -144,7 +146,7 @@ func (c *Camera) Read() (img image.Image) {
 	default:
 		yuv := image.NewYCbCr(size, image.YCbCrSubsampleRatio420)
 
-		yRange := roundUp(c.width, 32) * roundUp(c.height, 16)
+		yRange := roundUp(c.Width, 32) * roundUp(c.Height, 16)
 		uvRange := yRange / 4
 
 		frame := <-c.frame
