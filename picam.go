@@ -56,7 +56,8 @@ func New(width, height int, format Format) (*Camera, error) {
 		args = append(args, "--luma")
 		img = make([]uint8, width*height)
 	default:
-		img = make([]uint8, width*height+width*height/2)
+		w, h := roundUp(width, 32), roundUp(height, 16)
+		img = make([]uint8, w*h+w*h/2)
 	}
 
 	args = append(args, []string{"--output", "-"}...)

@@ -2,6 +2,7 @@ package picam
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"testing"
 )
@@ -67,7 +68,60 @@ func TestReadUint8(t *testing.T) {
 
 			got := len(img)
 			if got != ts.want {
-				t.Errorf("got: %T, want: %T", got, ts.want)
+				t.Errorf("got: %d, want: %d", got, ts.want)
+			}
+		})
+	}
+}
+
+func TestReadUint8_Sizes(t *testing.T) {
+	tests := []struct {
+		format        Format
+		width, height int
+		want          int // byte size
+	}{
+		{
+			YUV,
+			320, 240,
+			320*240 + 320*240/2,
+		},
+		{
+			YUV,
+			100, 100,
+			128*112 + 128*112/2,
+		},
+		{
+			RGB,
+			320, 240,
+			320 * 240 * 3,
+		},
+		{
+			Gray,
+			320, 240,
+			320 * 240,
+		},
+	}
+
+	for _, ts := range tests {
+		t.Run(fmt.Sprintf("%s (%d,%d)", ts.format, ts.width, ts.height), func(t *testing.T) {
+			cam, err := New(ts.width, ts.height, ts.format)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer cam.Close()
+
+			raw := cam.ReadUint8()
+
+			got := len(raw)
+			if got != ts.want {
+				t.Errorf("got: %d, want: %d", got, ts.want)
+			}
+
+			img := cam.Read()
+			gotP := img.Bounds().Size()
+			wantP := image.Point{ts.width, ts.height}
+			if gotP != wantP {
+				t.Errorf("got: %+v, want: %+v", gotP, wantP)
 			}
 		})
 	}
